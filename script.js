@@ -261,3 +261,16 @@ customerForm.addEventListener("submit", async (event) => {
     loadCustomers();
 
 });
+
+const customerSearch =
+    document.getElementById("customer-search");
+
+
+customerSearch.addEventListener("input", () => {
+
+    const searchText =
+        customerSearch.value.trim().toLowerCase();
+
+    filterCustomers(searchText);
+
+});
