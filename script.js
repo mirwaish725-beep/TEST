@@ -142,3 +142,41 @@ async function loadCustomers() {
 }
 
 loadCustomers();
+
+const addCustomerBtn =
+    document.getElementById("add-customer-btn");
+
+const customerFormContainer =
+    document.getElementById("customer-form-container");
+
+const closeCustomerForm =
+    document.getElementById("close-customer-form");
+
+const cancelCustomerBtn =
+    document.getElementById("cancel-customer");
+
+const customerForm =
+    document.getElementById("customer-form");
+
+
+addCustomerBtn.addEventListener("click", () => {
+
+    customerFormContainer.classList.remove("hidden");
+
+});
+
+
+closeCustomerForm.addEventListener("click", () => {
+
+    customerFormContainer.classList.add("hidden");
+
+});
+
+
+cancelCustomerBtn.addEventListener("click", () => {
+
+    customerForm.reset();
+
+    customerFormContainer.classList.add("hidden");
+
+});
