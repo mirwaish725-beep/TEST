@@ -256,3 +256,36 @@ document.addEventListener('change',function(e){
   if(id==='oCur')updateCalc('formHostNew');
   if(id==='eoCur')updateCalc('formHostEdit');
 });
+/* ═══ وصلهٔ ایمنی v5.2 — انتهای فایل JS ═══ */
+document.title = document.title + ' | v5.2';
+function settleOrder(id){const o=DB.orders.find(x=>x.id===id);if(!o)return;if(o.remaining<=0){o.status='settled';save();renderOrders();toast('تصفیه شد');return}
+const amt=prompt('باقی: '+money(o.remaining,o.currency)+'\nمبلغ دریافتی:',o.remaining);if(!amt)return;const n=+amt;
+if(n<=0||isNaN(n)){toast('نامعتبر','err');return}
+o.received=+(o.received+n).toFixed(2);o.remaining=Math.max(0,+(o.total-o.received).toFixed(2));o.status='settled';
+if(o.ctype==='credit')DB.ledger.push({id:uid(),customerId:o.customerId,orderId:id,type:'credit',currency:o.currency,amount:n,rate:o.rate,afnEq:o.rate?+(n*o.rate).toFixed(2):n,babat:'تسویه '+o.code,d:jToday()});
+save();renderOrders();toast('تصفیه شد')}
+document.addEventListener('click',function(e){
+  if(e.defaultPrevented)return;
+  const b=e.target.closest('[data-act]');if(!b)return;
+  e.preventDefault();
+  const a=b.dataset.act,id=b.dataset.id;
+  const M={
+    'view-order':()=>viewOrder(id),
+    'edit-order':()=>editOrder(id),
+    'register-order':()=>{const o=DB.orders.find(x=>x.id===id);o.status='registered';save();renderOrders();toast('ثبت شده شد')},
+    'settle-order':()=>settleOrder(id),
+    'open-ledger-order':()=>{const o=DB.orders.find(x=>x.id===id);if(o.ctype==='cash'){toast('نقدی پا حساب ندارد','info');return}show('customer',o.customerId)},
+    'print-order':()=>printOrder(DB.orders.find(x=>x.id===id)),
+    'print-receipt':()=>{const r=DB.receipts.find(x=>x.id===id);const c=DB.customers.find(x=>x.id===r.customerId);printReceipt(r,c,balancesOf(c.id))},
+    'print-payment':()=>printPayment(DB.payments.find(x=>x.id===id)),
+    'print-statement':()=>{const c=DB.customers.find(x=>x.id===id);if(c)printStatement(c)},
+    'open-customer':()=>show('customer',id),
+    'edit-customer':()=>openCustomerForm(id),
+    'view-provider':()=>viewProvider(id),
+    'edit-user':()=>uEdit(id),
+    'toggle-user':()=>uToggle(id),
+    'delete-user':()=>uDelete(id)
+  };
+  if(M[a]){try{M[a]()}catch(err){alert('خطا: '+err.message)}}
+});
+console.log('PATCH v5.2 active');
