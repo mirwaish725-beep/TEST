@@ -180,3 +180,84 @@ cancelCustomerBtn.addEventListener("click", () => {
     customerFormContainer.classList.add("hidden");
 
 });
+
+customerForm.addEventListener("submit", async (event) => {
+
+    event.preventDefault();
+
+    const customerNo =
+        Number(document.getElementById("customer-no").value);
+
+    const name =
+        document.getElementById("customer-name").value.trim();
+
+    const phone =
+        document.getElementById("customer-phone").value.trim();
+
+    const type =
+        document.getElementById("customer-type").value;
+
+    const address =
+        document.getElementById("customer-address").value.trim();
+
+    const description =
+        document.getElementById("customer-description").value.trim();
+
+
+    // بررسی اطلاعات ضروری
+    if (!customerNo || !name) {
+
+        alert("لطفاً شماره مشتری و نام مشتری را وارد کنید.");
+
+        return;
+    }
+
+
+    // ثبت مشتری در Supabase
+    const { data, error } = await supabaseClient
+        .from("customers")
+        .insert([
+            {
+                customer_no: customerNo,
+                name: name,
+                phone: phone,
+                address: address,
+                description: description,
+                type: type
+            }
+        ])
+        .select();
+
+
+    // بررسی خطا
+    if (error) {
+
+        console.error("Insert customer error:", error);
+
+        alert(
+            "ثبت مشتری انجام نشد:\n" +
+            error.message
+        );
+
+        return;
+    }
+
+
+    // موفقیت
+    console.log("Customer created:", data);
+
+    alert("✅ مشتری با موفقیت ثبت شد.");
+
+
+    // خالی کردن فرم
+    customerForm.reset();
+
+
+    // بستن فرم
+    customerFormContainer.classList.add("hidden");
+
+
+    // دریافت دوباره مشتریان
+    loadCustomers();
+
+});
