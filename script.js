@@ -43,7 +43,102 @@ async function testConnection() {
 
 testConnection();
 
-function hello() {
-    alert("سیستم سفارشات چاپخانه آماده است!");
+async function loadCustomers() {
+
+    const tableBody = document.getElementById(
+        "customers-table-body"
+    );
+
+    const { data, error } = await supabaseClient
+        .from("customers")
+        .select(`
+            id,
+            customer_no,
+            name,
+            phone,
+            address,
+            description,
+            type,
+            created_at
+        `)
+        .order("id", {
+            ascending: false
+        });
+
+    if (error) {
+
+        console.error(error);
+
+        tableBody.innerHTML = `
+            <tr>
+                <td colspan="5">
+                    خطا در دریافت مشتریان
+                </td>
+            </tr>
+        `;
+
+        return;
+    }
+
+    if (!data || data.length === 0) {
+
+        tableBody.innerHTML = `
+            <tr>
+                <td colspan="5">
+                    هنوز مشتری ثبت نشده است.
+                </td>
+            </tr>
+        `;
+
+        return;
+    }
+
+    tableBody.innerHTML = "";
+
+    data.forEach(customer => {
+
+        const typeText =
+            customer.type === "credit"
+                ? "نسیه"
+                : "نقدی";
+
+        const typeClass =
+            customer.type === "credit"
+                ? "customer-type-credit"
+                : "customer-type-cash";
+
+        tableBody.innerHTML += `
+
+            <tr>
+
+                <td>
+                    ${customer.customer_no ?? "-"}
+                </td>
+
+                <td>
+                    ${customer.name ?? "-"}
+                </td>
+
+                <td>
+                    ${customer.phone ?? "-"}
+                </td>
+
+                <td class="${typeClass}">
+                    ${typeText}
+                </td>
+
+                <td>
+                    <button
+                        onclick="viewCustomer(${customer.id})"
+                    >
+                        مشاهده
+                    </button>
+                </td>
+
+            </tr>
+
+        `;
+    });
 }
 
+loadCustomers();
