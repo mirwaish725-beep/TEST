@@ -33,7 +33,7 @@ const jWeekday=j=>{const g=J.d2g(jdnOf(j));return WEEKDAYS[new Date(g.gy,g.gm-1,
 const nowTime=()=>{const n=new Date();return faDigits(String(n.getHours()).padStart(2,'0')+':'+String(n.getMinutes()).padStart(2,'0'))};
 const LS_KEY='ashna_db_v5';
 const ROLE_DEFS={modir:{name:'مدیر',modules:['dashboard','orders','customers','gudam','finance','settings']},pazirosh:{name:'کارمند پذیرش',modules:['dashboard','orders','customers']},hesabdar:{name:'حسابدار',modules:['dashboard','customers','finance']},gudam:{name:'مسئول گدام',modules:['dashboard','gudam']}};
-function seedData(){const T=jToday(),D=off=>jAdd(T,off);let oc=1000,cc=100,rc=500,pc=200;
+function seedData(){const t=jToday(),d=off=>jAdd(t,off),let=1000,cc=106,rc=500,pc=200;
 const customers=[{id:uid(),code:'C-101',name:'احمد رحیمی',phone:'0700123456',type:'credit',address:'کابل، کارته سه',note:'',d:D(-220)},{id:uid(),code:'C-102',name:'حاجی عبدالله',phone:'0707445566',type:'credit',address:'کابل',note:'',d:D(-180)},{id:uid(),code:'C-103',name:'فاطمه احمدی',phone:'0780112233',type:'cash',address:'کابل',note:'',d:D(-90)},{id:uid(),code:'C-104',name:'شرکت کابل پرینت',phone:'0799887766',type:'credit',address:'کابل',note:'',d:D(-140)},{id:uid(),code:'C-105',name:'نجیب‌الله صافی',phone:'0744556677',type:'cash',address:'پروان',note:'',d:D(-45)},{id:uid(),code:'C-106',name:'استاد ضیایاالدین',phone:'0777334455',type:'credit',address:'کابل',note:'',d:D(-30)}];
 const[c1,c2,c3,c4,c5,c6]=customers;const orders=[],ledger=[],receipts=[];
 const mkO=(cust,off,job,qty,color,size,material,pack,price,cur,rate,rec,status,note='')=>{const total=+(qty*price).toFixed(2),remaining=+(total-rec).toFixed(2);const o={id:uid(),code:'SO-'+(++oc),d:D(off),job,customerId:cust.id,customerName:cust.name,ctype:cust.type,phone:cust.phone,qty,color,size,material,pack,price,currency:cur,rate:cur==='USD'?rate:null,total,received:rec,remaining,note,delivery:null,status};orders.push(o);if(cust.type==='credit'&&remaining>0)ledger.push({id:uid(),customerId:cust.id,orderId:o.id,type:'debit',currency:cur,amount:remaining,rate:cur==='USD'?rate:null,afnEq:cur==='USD'?+(remaining*rate).toFixed(2):remaining,babat:'سفارش '+o.code+' — '+job,d:D(off)});return o};
@@ -95,8 +95,44 @@ if(!job)return toast('نام کار ضروری است','err');if(q<=0)return toa
 const oId=$('#'+p+'Id').value;const existing=oId?DB.orders.find(x=>x.id===oId):null;const cid=$('#'+p+'CustSel').value;let cust;
 if(cid)cust=DB.customers.find(x=>x.id===cid);else if(existing)cust=DB.customers.find(x=>x.id===existing.customerId);else{const nm=prompt('نام مشتری جدید:');if(!nm)return toast('نام مشتری لازم است','err');const ph=prompt('تماس:')||'';const ty=$('input[name="'+h+'_type"]:checked')?.value||'cash';cust={id:uid(),code:'C-'+(++DB.seq.customer),name:nm.trim(),phone:ph,type:ty,address:'',note:'',d:jToday()};DB.customers.push(cust)}
 const rem=+(total-rc).toFixed(2);
-if(existing){Object.assign(existing,{job,qty:q,price:pr,currency:cur,rate:cur==='USD'?rate:existing.rate,total,received:rc,remaining:rem,color:$('#'+p+'Color').value,size:$('#'+p+'Size').value.trim(),material:$('#'+p+'Mat').value.trim(),pack:$('#'+p+'Pack').checked,note:$('#'+p+'Note').value.trim()});DB.ledger=DB.ledger.filter(l=>l.orderId!==oId||l.type!=='debit');if(cust.type==='credit'&&rem>0)DB.ledger.push({id:uid(),customerId:cust.id,orderId:oId,type:'debit',currency:cur,amount:rem,rate:cur==='USD'?rate:null,afnEq:cur==='USD'?+(rem*rate).toFixed(2):rem,babat:'سفارش '+existing.code+' — '+job,d:existing.d});addLog('سفارش '+existing.code+' ویرایش شد.');toast('به‌روزرسانی شد')}
-else{const o={id:uid(),code:'SO-'+(++DB.seq.order),d:jToday(),job,customerId:cust.id,customerName:cust.name,ctype:cust.type,phone:cust.phone,qty:q,color:$('#'+p+'Color').value,size:$('#'+p+'Size').value.trim(),material:$('#'+p+'Mat').value.trim(),pack:$('#'+p+'Pack').checked,price:pr,currency:cur,rate:cur==='USD'?rate:null,total,received:rc,remaining:rem,note:$('#'+p+'Note').value.trim(),delivery:null,status:(cust.type==='cash'&&rem===0)?'settled':'new'};DB.orders.push(o);if(cust.type==='credit'&&rem>0)DB.ledger.push({id:uid(),customerId:cust.id,orderId:o.id,type:'debit',currency:cur,amount:rem,rate:cur==='USD'?rate:null,afnEq:cur==='USD'?+(rem*rate).toFixed(2):rem,babat:'سفارش '+o.code+' — '+job,d:jToday()});addLog('سفارش '+o.code+' ثبت شد.');toast('سفارش '+faDigits(o.code)+' ثبت شد');resetOrderForm()}
+if(existing){
+  Object.assign(existing,{
+    job,
+    qty:q,
+    price:pr,
+    currency:cur,
+    rate:cur==='USD'?rate:existing.rate,
+    total,
+    received:rc,
+    remaining:rem,
+    color:$('#'+p+'Color').value,
+    size:$('#'+p+'Size').value.trim(),
+    material:$('#'+p+'Mat').value.trim(),
+    pack:$('#'+p+'Pack').checked,
+    note:$('#'+p+'Note').value.trim(),
+    status:rem===0?'settled':'registered'
+  });
+
+  DB.ledger=DB.ledger.filter(l=>l.orderId!==oId||l.type!=='debit');
+
+  if(cust.type==='credit'&&rem>0){
+    DB.ledger.push({
+      id:uid(),
+      customerId:cust.id,
+      orderId:oId,
+      type:'debit',
+      currency:cur,
+      amount:rem,
+      rate:cur==='USD'?rate:null,
+      afnEq:cur==='USD'?+(rem*rate).toFixed(2):rem,
+      babat:'سفارش '+existing.code+' — '+job,
+      d:existing.d
+    });
+  }
+
+  addLog('سفارش '+existing.code+' ویرایش شد.');
+  toast('به‌روزرسانی شد');
+}else{const o={id:uid(),code:'SO-'+(++DB.seq.order),d:jToday(),job,customerId:cust.id,customerName:cust.name,ctype:cust.type,phone:cust.phone,qty:q,color:$('#'+p+'Color').value,size:$('#'+p+'Size').value.trim(),material:$('#'+p+'Mat').value.trim(),pack:$('#'+p+'Pack').checked,price:pr,currency:cur,rate:cur==='USD'?rate:null,total,received:rc,remaining:rem,note:$('#'+p+'Note').value.trim(),delivery:null,status:rem===0?'settled':'registered'};DB.orders.push(o);if(cust.type==='credit'&&rem>0)DB.ledger.push({id:uid(),customerId:cust.id,orderId:o.id,type:'debit',currency:cur,amount:rem,rate:cur==='USD'?rate:null,afnEq:cur==='USD'?+(rem*rate).toFixed(2):rem,babat:'سفارش '+o.code+' — '+job,d:jToday()});addLog('سفارش '+o.code+' ثبت شد.');toast('سفارش '+faDigits(o.code)+' ثبت شد');resetOrderForm()}
 save();if(h==='formHostNew')show('orders');else{closeModal('#modalOrder');show(CURRENT)}}
 function renderOrders(){const q=($('#orderSearch').value||'').trim();let l=[...DB.orders].sort((a,b)=>jdnOf(b.d)-jdnOf(a.d));if(ORD_FILTER!=='all')l=l.filter(o=>o.status===ORD_FILTER);if(q)l=l.filter(o=>(o.code+o.job+o.customerName+o.phone).includes(q));
 $('#orderStatusChips').innerHTML=[['all','همه'],['new','در جریان'],['registered','ثبت شده'],['settled','تصفیه شده']].map(c=>'<button class="chip '+(ORD_FILTER===c[0]?'on':'')+'" data-filter="'+c[0]+'">'+c[1]+'</button>').join('');$('#ordersCount').textContent=fa(l.length)+' سفارش';
@@ -140,7 +176,43 @@ function renderReceived(){const rs=[...DB.receipts].sort((a,b)=>jdnOf(b.d)-jdnOf
 $('#receivedBody').innerHTML=rs.length?rs.map(r=>{const c=DB.customers.find(x=>x.id===r.customerId);return'<tr><td><b>'+faDigits(r.code)+'</b></td><td>'+jStr(r.d)+'</td><td>'+esc(c?.name||'—')+'</td><td>'+esc(r.babat)+'</td><td><b>'+money(r.amount,r.currency)+'</b></td><td>'+(r.rate?fa(r.rate):'—')+'</td><td>'+fa(r.afnEq)+' ؋</td><td>'+ibtn('print-receipt',r.id,'🖨','','چاپ')+'</td></tr>'}).join(''):'<tr class="empty"><td colspan="8">نیست</td></tr>'}
 function initPayForm(){$('#pDate').textContent=jLong(jToday());updatePayCalc();renderPaysList()}
 function updatePayCalc(){const cur=$('#pCur').value,amt=+$('#pAmount').value||0;$('#pRateWrap').hidden=cur!=='USD';$('#pAfnWrap').hidden=cur!=='USD';if(cur==='USD'&&!$('#pRate').value)$('#pRate').value=DB.settings.usdRate;$('#pAfnEq').value=cur==='USD'?fa(amt*(+$('#pRate').value||0))+' ؋':''}
-function savePayment(){const babat=$('#pBabat').value.trim(),amt=+$('#pAmount').value||0;const cur=$('#pCur').value,rate=cur==='USD'?(+$('#pRate').value||0):null;if(!babat)return toast('بابت لازم است','err');if(amt<=0)return toast('مبلغ لازم است','err');if(cur==='USD'&&rate<=0)return toast('نرخ لازم است','err');const p={id:uid(),code:'P-'+(++DB.seq.pay),babat,checkNo:$('#pCheck').value.trim(),d:jToday(),currency:cur,amount:amt,rate,afnEq:cur==='USD'?+(amt*rate).toFixed(2):amt,note:$('#pNote').value.trim()};DB.payments.push(p);addLog('سند '+p.code+' صادر شد.');save();printPayment(p);toast('سند صادر شد');$('#pBabat').value='';$('#pAmount').value='';renderPaysList()}
+function savePayment(){
+  const babat=$('#pBabat').value.trim();
+  const amt=+$('#pAmount').value||0;
+  const cur=$('#pCur').value;
+  const rate=cur==='USD'?(+$('#pRate').value||0):null;
+
+  if(!babat)return toast('بابت لازم است','err');
+  if(amt<=0)return toast('مبلغ لازم است','err');
+  if(cur==='USD'&&rate<=0)return toast('نرخ لازم است','err');
+
+  const p={
+    id:uid(),
+    code:'P-'+(++DB.seq.pay),
+    babat,
+    checkNo:$('#pCheck').value.trim(),
+    d:jToday(),
+    currency:cur,
+    amount:amt,
+    rate,
+    afnEq:cur==='USD'?+(amt*rate).toFixed(2):amt,
+    note:$('#pNote').value.trim()
+  };
+
+  DB.payments.push(p);
+
+  addLog('سند '+p.code+' صادر شد.');
+
+  save();
+  printPayment(p);
+
+  toast('سند صادر شد');
+
+  $('#pBabat').value='';
+  $('#pAmount').value='';
+
+  renderPaysList();
+}
 function renderPaysList(){const ps=[...DB.payments].sort((a,b)=>jdnOf(b.d)-jdnOf(a.d));$('#paysBody').innerHTML=ps.length?ps.map(p=>'<tr><td><b>'+faDigits(p.code)+'</b></td><td>'+jStr(p.d)+'</td><td>'+esc(p.babat)+'</td><td>'+faDigits(p.checkNo||'—')+'</td><td>'+money(p.amount,p.currency)+'</td><td>'+ibtn('print-payment',p.id,'🖨','','چاپ')+'</td></tr>').join(''):'<tr class="empty"><td colspan="6">نیست</td></tr>'}
 function renderFinance(){const tA=DB.receipts.filter(r=>r.currency==='AFN').reduce((s,r)=>s+r.amount,0);const tU=DB.receipts.filter(r=>r.currency==='USD').reduce((s,r)=>s+r.amount,0);const tR=DB.receipts.reduce((s,r)=>s+r.afnEq,0);const tP=DB.payments.reduce((s,p)=>s+p.afnEq,0);let debt=0;DB.customers.filter(c=>c.type==='credit').forEach(c=>{const v=balAfnEq(balancesOf(c.id));if(v>0)debt+=v});
 $('#finChips').innerHTML='<div class="mini"><div class="lbl">دریافت افغانی</div><div class="num">'+fa(tA)+' ؋</div></div><div class="mini"><div class="lbl">دریافت دالر</div><div class="num">'+fa(tU)+' $</div></div><div class="mini"><div class="lbl">کل دریافت</div><div class="num">'+fa(tR)+' ؋</div></div><div class="mini"><div class="lbl">کل پرداخت</div><div class="num">'+fa(tP)+' ؋</div></div><div class="mini"><div class="lbl">طلب نسیه</div><div class="num" style="color:var(--red)">'+fa(debt)+' ؋</div></div>';
@@ -178,7 +250,94 @@ document.addEventListener('click',function(e){
       case 'view-order':viewOrder(id);break;
       case 'edit-order':editOrder(id);break;
       case 'register-order':{const o=DB.orders.find(x=>x.id===id);o.status='registered';save();toast('ثبت شده شد');renderOrders();break}
-      case 'settle-order':{const o=DB.orders.find(x=>x.id===id);if(o.remaining<=0){o.status='settled';save();toast('تصفیه شد');renderOrders();break}const amt=prompt('باقی: '+money(o.remaining,o.currency)+'\nدریافتی:',o.remaining);if(!amt)break;const n=+amt;if(n<=0||isNaN(n)){toast('نامعتبر','err');break}o.received=+(o.received+n).toFixed(2);o.remaining=Math.max(0,+(o.total-o.received).toFixed(2));o.status='settled';if(o.ctype==='credit')DB.ledger.push({id:uid(),customerId:o.customerId,orderId:id,type:'credit',currency:o.currency,amount:n,rate:o.rate,afnEq:o.rate?+(n*o.rate).toFixed(2):n,babat:'تسویه '+o.code,d:jToday()});save();toast('تصفیه شد');renderOrders();break}
+      case 'settle-order':{
+  const o=DB.orders.find(x=>x.id===id);
+
+  if(!o){
+    toast('سفارش پیدا نشد','err');
+    break;
+  }
+
+  if(o.remaining<=0){
+    o.received=o.total;
+    o.remaining=0;
+    o.status='settled';
+
+    DB.ledger=DB.ledger.filter(l=>l.orderId!==id||l.type!=='debit');
+
+    save();
+    toast('سفارش قبلاً تصفیه شده بود','info');
+    renderOrders();
+    break;
+  }
+
+  const amt=prompt(
+    'باقی: '+money(o.remaining,o.currency)+'\nمبلغ دریافتی:',
+    o.remaining
+  );
+
+  if(!amt)break;
+
+  const n=+amt;
+
+  if(isNaN(n)||n<=0){
+    toast('مبلغ وارد شده نامعتبر است','err');
+    break;
+  }
+
+  if(n>o.remaining){
+    toast('مبلغ دریافتی نمی‌تواند بیشتر از باقی‌مانده باشد','err');
+    break;
+  }
+
+  o.received=+(o.received+n).toFixed(2);
+  o.remaining=Math.max(0,+(o.total-o.received).toFixed(2));
+
+  if(o.remaining===0){
+    o.status='settled';
+  }else{
+    o.status='registered';
+  }
+
+  if(o.ctype==='credit'){
+    DB.ledger=DB.ledger.filter(
+      l=>!(l.orderId===id&&l.type==='debit')
+    );
+
+    if(o.remaining>0){
+      DB.ledger.push({
+        id:uid(),
+        customerId:o.customerId,
+        orderId:id,
+        type:'debit',
+        currency:o.currency,
+        amount:o.remaining,
+        rate:o.rate,
+        afnEq:o.rate?+(o.remaining*o.rate).toFixed(2):o.remaining,
+        babat:'باقی سفارش '+o.code,
+        d:o.d
+      });
+    }
+
+    DB.ledger.push({
+      id:uid(),
+      customerId:o.customerId,
+      orderId:id,
+      type:'credit',
+      currency:o.currency,
+      amount:n,
+      rate:o.rate,
+      afnEq:o.rate?+(n*o.rate).toFixed(2):n,
+      babat:'پرداخت سفارش '+o.code,
+      d:jToday()
+    });
+  }
+
+  save();
+  toast(o.remaining===0?'سفارش تصفیه شد':'پرداخت ثبت شد');
+  renderOrders();
+  break;
+}
       case 'open-ledger-order':{const o=DB.orders.find(x=>x.id===id);if(o.ctype==='cash'){toast('نقدی پا حساب ندارد','info');break}show('customer',o.customerId);break}
       case 'print-order':printOrder(DB.orders.find(x=>x.id===id));break;
       case 'print-receipt':{const r=DB.receipts.find(x=>x.id===id);const c=DB.customers.find(x=>x.id===r.customerId);printReceipt(r,c,balancesOf(c.id));break}
