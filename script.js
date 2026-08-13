@@ -1,6 +1,6 @@
-const SUPABASE_URL = "اینجا Project URL را قرار بده";
+const SUPABASE_URL = "tujcsmurmojnnkhavglf";
 
-const SUPABASE_KEY = "اینجا Publishable key را قرار بده";
+const SUPABASE_KEY = "sb_publishable_IkpCvlrLg7a1oQQrqXzBHg_tRJ6HJFY";
 
 
 const supabaseClient = supabase.createClient(
