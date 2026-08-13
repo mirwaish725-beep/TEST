@@ -72,7 +72,118 @@
                 >
 
             </div>
+<!-- فرم ثبت مشتری -->
+<div id="customer-form-container" class="form-container hidden">
 
+    <div class="form-header">
+        <h3>ثبت مشتری جدید</h3>
+
+        <button
+            type="button"
+            id="close-customer-form"
+            class="close-btn"
+        >
+            ×
+        </button>
+    </div>
+
+    <form id="customer-form">
+
+        <div class="form-grid">
+
+            <div class="form-group">
+                <label>شماره مشتری</label>
+
+                <input
+                    type="number"
+                    id="customer-no"
+                    required
+                >
+            </div>
+
+
+            <div class="form-group">
+                <label>نام مشتری</label>
+
+                <input
+                    type="text"
+                    id="customer-name"
+                    required
+                >
+            </div>
+
+
+            <div class="form-group">
+                <label>شماره تماس</label>
+
+                <input
+                    type="text"
+                    id="customer-phone"
+                >
+            </div>
+
+
+            <div class="form-group">
+                <label>نوع مشتری</label>
+
+                <select id="customer-type" required>
+
+                    <option value="credit">
+                        نسیه
+                    </option>
+
+                    <option value="cash">
+                        نقدی
+                    </option>
+
+                </select>
+            </div>
+
+
+            <div class="form-group full-width">
+                <label>آدرس</label>
+
+                <input
+                    type="text"
+                    id="customer-address"
+                >
+            </div>
+
+
+            <div class="form-group full-width">
+                <label>توضیحات</label>
+
+                <textarea
+                    id="customer-description"
+                    rows="3"
+                ></textarea>
+            </div>
+
+        </div>
+
+
+        <div class="form-actions">
+
+            <button
+                type="button"
+                id="cancel-customer"
+                class="cancel-btn"
+            >
+                لغو
+            </button>
+
+            <button
+                type="submit"
+                class="save-btn"
+            >
+                ثبت مشتری
+            </button>
+
+        </div>
+
+    </form>
+
+</div>
             <div class="table-container">
 
                 <table>
