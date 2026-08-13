@@ -42,13 +42,73 @@
 
 <body>
 
-    <h1>سیستم سفارشات چاپخانه</h1>
+    <div class="app">
 
-    <button onclick="hello()">
-        تست سیستم
-    </button>
+        <header class="topbar">
+            <h1>سیستم مدیریت چاپخانه</h1>
+        </header>
+
+        <main class="content">
+
+            <div class="page-header">
+
+                <div>
+                    <h2>👥 مشتریان</h2>
+                    <p>مدیریت مشتریان چاپخانه</p>
+                </div>
+
+                <button id="add-customer-btn">
+                    + مشتری جدید
+                </button>
+
+            </div>
+
+            <div class="search-box">
+
+                <input
+                    type="text"
+                    id="customer-search"
+                    placeholder="جستجوی نام یا شماره تماس..."
+                >
+
+            </div>
+
+            <div class="table-container">
+
+                <table>
+
+                    <thead>
+
+                        <tr>
+                            <th>شماره</th>
+                            <th>نام مشتری</th>
+                            <th>شماره تماس</th>
+                            <th>نوع</th>
+                            <th>عملیات</th>
+                        </tr>
+
+                    </thead>
+
+                    <tbody id="customers-table-body">
+
+                        <tr>
+                            <td colspan="5">
+                                در حال دریافت مشتریان...
+                            </td>
+                        </tr>
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </main>
+
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
     <script src="script.js"></script>
 
 </body>
-</html>
