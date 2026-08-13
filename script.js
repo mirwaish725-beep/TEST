@@ -1,3 +1,7 @@
+function hello() {
+    alert("سیستم سفارشات چاپخانه آماده است!");
+}
+
 const SUPABASE_URL = "اینجا Project URL را قرار بده";
 
 const SUPABASE_KEY = "اینجا Publishable key را قرار بده";
@@ -42,7 +46,3 @@ async function testConnection() {
 
 
 testConnection();
-
-function hello() {
-    alert("سیستم سفارشات چاپخانه آماده است!");
-}
