@@ -43,7 +43,21 @@ async function testConnection() {
 
 testConnection();
 
-async function loadCustomers() {
+let allCustomers = [];
+async function loadCustomers(if (error) {
+
+    console.error(error);
+
+    tableBody.innerHTML = `
+        <tr>
+            <td colspan="5">
+                خطا در دریافت مشتریان
+            </td>
+        </tr>
+    `;
+
+    return;
+}) {
 
     const tableBody = document.getElementById(
         "customers-table-body"
