@@ -103,8 +103,8 @@ function seed() {
   const users = [
     {
       id: "u1",
-      username: "admin",
-      pass: "admin123",
+      username: "",
+      pass: "",
       name: "مدیر سیستم",
       role: "admin"
     },
