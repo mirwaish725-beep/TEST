@@ -1837,10 +1837,14 @@ function init() {
   applyTheme(localStorage.getItem("ps_theme") || "light");
   ensureDB();
   bind();
+  
+  // ✅ تست اتصال بعد از آماده شدن DB
+  testConnection();
+  
   const s = sessionStorage.getItem("ps_user");
   if (s) {
     currentUser = JSON.parse(s);
     enterApp(false);
   }
 }
-testConnection();
+init();  // ✅ اجرای تابع init
