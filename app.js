@@ -1843,4 +1843,4 @@ function init() {
     enterApp(false);
   }
 }
-init();
+testConnection();
