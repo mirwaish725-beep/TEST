@@ -1,27 +1,37 @@
 <!DOCTYPE html>
 <html lang="fa" dir="rtl">
-
 <head>
-    <meta charset="UTF-8">
-
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <title>سیستم مدیریت چاپخانه</title>
-
+    ...
     <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
-
-    <h1>سیستم مدیریت چاپخانه</h1>
-
-    <p id="connection-status">
-        در حال اتصال به دیتابیس...
-    </p>
+    <!-- پیام وضعیت اتصال -->
+    <p id="connection-status">در حال اتصال به دیتابیس...</p>
 
     <!-- کتابخانه Supabase -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
+    <!-- صفحه ورود -->
+    <div id="loginScreen" class="login">
+        ...
+    </div>
+
+    <!-- بدنه اصلی برنامه -->
+    <div id="app" class="app hidden">
+        ...
+    </div>
+
+    <!-- مودال‌ها -->
+    <div class="modal" id="modalOrder">...</div>
+    <div class="modal" id="modalConfirm">...</div>
+
+    <div id="chartTip" class="chart-tip"></div>
+    <div id="printArea"></div>
+    <div id="toasts"></div>
+
+    <!-- اسکریپت اصلی -->
+    <script src="app.js"></script>
 </body>
   <!-- ══════════ صفحهٔ ورود ══════════ -->
   <div id="loginScreen" class="login">
