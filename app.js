@@ -74,23 +74,52 @@ const canDel = () => currentUser && currentUser.role === "admin";
 async function ensureDB() {
     console.log("🔄 در حال دریافت اطلاعات از سرور...");
     
-    const { data: s } = await supabaseClient.from('settings').select('*').single();
-    DB.settings = s || { shop: "چاپخانه آشنا", nextNo: 1001 };
+    try {
+        // دریافت تنظیمات
+        const { data: s, error: errSettings } = await supabaseClient
+            .from('settings')
+            .select('*')
+            .single();
+        
+        if (errSettings) {
+            console.warn("تنظیمات یافت نشد، مقدار پیش‌فرض استفاده می‌شود:", errSettings);
+            DB.settings = { shop: "چاپخانه آشنا", nextNo: 1001 };
+        } else {
+            DB.settings = s || { shop: "چاپخانه آشنا", nextNo: 1001 };
+        }
 
-    const { data: u } = await supabaseClient.from('users').select('*');
-    DB.users = u || [];
+        // دریافت کاربران
+        const { data: u, error: errUsers } = await supabaseClient
+            .from('users')
+            .select('*');
+        
+        if (errUsers) {
+            console.error("خطا در دریافت کاربران:", errUsers);
+            DB.users = [];
+        } else {
+            DB.users = u || [];
+        }
 
-    const { data: o } = await supabaseClient.from('orders').select('*').order('date', { ascending: false });
-    DB.orders = o || [];
-    
-    console.log("✅ اطلاعات از سرور بارگذاری شد");
+        // دریافت سفارشات
+        const { data: o, error: errOrders } = await supabaseClient
+            .from('orders')
+            .select('*')
+            .order('date', { ascending: false });
+        
+        if (errOrders) {
+            console.error("خطا در دریافت سفارشات:", errOrders);
+            DB.orders = [];
+        } else {
+            DB.orders = o || [];
+        }
+        
+        console.log("✅ اطلاعات از سرور بارگذاری شد");
+        console.log("تعداد کاربران:", DB.users.length);
+        console.log("تعداد سفارشات:", DB.orders.length);
+    } catch (error) {
+        console.error("خطای کلی در ensureDB:", error);
+    }
 }
-
-function log(user, text) {
-  DB.logs.unshift({ t: new Date().toISOString(), user, text });
-  DB.logs = DB.logs.slice(0, 300); // نگهداری در حافظه موقت
-}
-
 /* ───────── احراز هویت (اصلاح شده برای بررسی مستقیم از سرور) ───────── */
 async function doLogin(u, p) {
     try {
