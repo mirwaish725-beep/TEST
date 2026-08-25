@@ -91,14 +91,32 @@ function log(user, text) {
   DB.logs = DB.logs.slice(0, 300); // نگهداری در حافظه موقت
 }
 
-/* ───────── احراز هویت ───────── */
-function doLogin(u, p) {
-  const user = DB.users.find((x) => x.username === u && x.pass === p);
-  if (!user) return false;
-  currentUser = { username: user.username, name: user.name, role: user.role };
-  sessionStorage.setItem("ps_user", JSON.stringify(currentUser));
-  log(user.name, "وارد سیستم شد");
-  return true;
+/* ───────── احراز هویت (اصلاح شده برای بررسی مستقیم از سرور) ───────── */
+async function doLogin(u, p) {
+    try {
+        const { data, error } = await supabaseClient
+            .from('users')
+            .select('*')
+            .eq('username', u)
+            .eq('pass', p)
+            .single();
+        
+        if (error || !data) {
+            return false;
+        }
+        
+        currentUser = { 
+            username: data.username, 
+            name: data.name, 
+            role: data.role 
+        };
+        sessionStorage.setItem("ps_user", JSON.stringify(currentUser));
+        log(data.name, "وارد سیستم شد");
+        return true;
+    } catch (err) {
+        console.error("Login error:", err);
+        return false;
+    }
 }
 
 function enterApp(welcome = true) {
@@ -513,12 +531,22 @@ function applyTheme(t) { document.documentElement.dataset.theme = t; localStorag
 
 /* ───────── اتصال رویدادها ───────── */
 function bind() {
-  $("#loginForm").addEventListener("submit", (e) => {
+  // ✅ اصلاح شده: استفاده از async/await برای بررسی مستقیم از سرور
+  $("#loginForm").addEventListener("submit", async (e) => {
     e.preventDefault();
-    if (doLogin($("#loginUser").value.trim(), $("#loginPass").value)) { $("#loginErr").textContent = ""; enterApp(); }
-    else $("#loginErr").textContent = "نام کاربری یا رمز عبور اشتباه است!";
+    if (await doLogin($("#loginUser").value.trim(), $("#loginPass").value)) { 
+        $("#loginErr").textContent = ""; 
+        enterApp(); 
+    } else {
+        $("#loginErr").textContent = "نام کاربری یا رمز عبور اشتباه است!";
+    }
   });
-  $$(".demo-btn").forEach((b) => b.addEventListener("click", () => { $("#loginUser").value = b.dataset.u; $("#loginPass").value = b.dataset.p; $("#loginForm").requestSubmit(); }));
+  
+  $$(".demo-btn").forEach((b) => b.addEventListener("click", () => { 
+      $("#loginUser").value = b.dataset.u; 
+      $("#loginPass").value = b.dataset.p; 
+      $("#loginForm").requestSubmit(); 
+  }));
   
   const words = ["کارت ویزیت", "بنر و فلکس", "بروشور", "سررسید", "پوستر", "کاتالوگ", "تراکت", "دعوتنامه"];
   let wi = 0;
