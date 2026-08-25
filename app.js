@@ -1,3 +1,75 @@
+// ==========================================
+// 1. اتصال به Supabase
+// ==========================================
+
+const SUPABASE_URL =
+    "https://tujcsmurmojnnkhavglf.supabase.co";
+
+const SUPABASE_KEY =
+    "sb_publishable_IkpCvlrLg7a1oQQrqXzBHg_tRJ6HJFY";
+
+const supabaseClient = supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_KEY
+);
+
+
+// ==========================================
+// 2. متغیرهای عمومی
+// ==========================================
+
+let allCustomers = [];
+
+
+// ==========================================
+// 3. تست اتصال به Supabase
+// ==========================================
+
+async function testConnection() {
+
+    const status =
+        document.getElementById("connection-status");
+
+    try {
+
+        const { data, error } =
+            await supabaseClient
+                .from("customers")
+                .select("id")
+                .limit(1);
+
+        if (error) {
+            throw error;
+        }
+
+        if (status) {
+
+            status.textContent =
+                "✅ اتصال به دیتابیس با موفقیت انجام شد";
+
+        }
+
+        console.log(
+            "Supabase connected:",
+            data
+        );
+
+    } catch (error) {
+
+        if (status) {
+
+            status.textContent =
+                "❌ اتصال به دیتابیس انجام نشد";
+
+        }
+
+        console.error(
+            "Supabase Error:",
+            error
+        );
+    }
+}
+
 "use strict";
 /* ════════════════════════════════════════════════════════
    چاپ‌یار — سیستم مدیریت سفارشات چاپخانه
